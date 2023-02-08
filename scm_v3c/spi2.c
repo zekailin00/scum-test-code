@@ -51,7 +51,7 @@ node_t* get_node(int handle)
     return node;
 }
 
-int open(pin_config_t *pin_config, mode_t mode)
+int open(pin_config_t *pin_config, mode_t* mode)
 {
     uint32_t gpi;
     uint32_t gpo;

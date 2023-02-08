@@ -4,7 +4,7 @@
 #include "scm3c_hw_interface.h"
 #include "memory_map.h"
 #include "optical.h"
-#include "ads1299.h"
+#include "ads1299-2.h"
 //=========================== defines =========================================
 
 #define CRC_VALUE         (*((unsigned int *) 0x0000FFFC))
@@ -34,30 +34,6 @@ int main(void) {
     crc_check();
     perform_calibration();
     
-    // Configure GPIO
-    // Set GPI enables
-	// Hex nibble 1: 0x2 = 0b0010
-	//	Pin 13 (DIN/SPI_MISO)
-	// Hex nibble 4: 0x8 = 0b1000 
-    //  Pin 3	(DRDY)
-    GPI_enables(0x2008);
-
-    // Set GPO enables
-    // Hex nibble 1: 0xD = 14 = 0b1101 
-    //  Pin 15 (ADS_RESET), Pin 14 (SPI_SCLK), Pin 12 (SPI_MOSI)
-	// Hex nibble 2: 0x8 = 0b1000 = 
-    //  Pin 11 (SPI_CS)
-    // Hex nibble 3: 0x8 = 0b1000 =
-    //  Pin 7 (ADS_DVDD 1.8V)
-    GPO_enables(0xD880);
-    
-    // Program analog scan chain (update GPIO configs)
-    analog_scan_chain_write();
-    analog_scan_chain_load();
-    
-//    initialize_imu();
-//    test_imu_life();
-    // 
 	ADS_initialize();
 	ADS_RESET();
     ADS_SDATAC();

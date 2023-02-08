@@ -36,7 +36,7 @@ int read(int handle, unsigned char* byte);
 /**
  * Writes a byte to the SPI device specified by handle.
 */
-int write(int handle, const unsigned char write_byte)
+int write(int handle, const unsigned char write_byte);
 //TODO:? int write(int fd, const void *buf, int count);
 
 /**
@@ -47,7 +47,7 @@ int close(int handle);
 /**
  * Opens a SPI device.
 */
-int open(pin_config_t *pin_config, mode_t mode);
+int open(pin_config_t *pin_config, mode_t* mode);
 
 /**
  * IO control for SPI.
