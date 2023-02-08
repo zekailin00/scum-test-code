@@ -34,6 +34,18 @@ uint8_t digitalRead(int pin) {
 	return i;
 }
 
+void spi_write(const unsigned char write_byte )
+{
+    write(spi_handle, write_byte);
+}
+
+unsigned char spi_read(){
+    unsigned char read_byte;
+    read(spi_handle, &read_byte);
+    return read_byte;
+}
+
+
 void ADS_initialize() {
     int t;
     int rst_pin = RST_PIN;
