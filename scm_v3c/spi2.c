@@ -110,6 +110,8 @@ int write(int handle, const unsigned char write_byte)
     int bit;
     node_t* node;
 
+    printf("SPI write begin\n");
+
     node = get_node(handle);
     if (node == 0)
         return INVALID_HANDLE;

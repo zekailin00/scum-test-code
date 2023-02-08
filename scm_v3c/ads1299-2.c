@@ -131,6 +131,8 @@ void ADS_RESET() {
     
     // digitalWrite(CS_PIN, 1);
     ioctl(spi_handle, SPI_DESELECT, 0);
+
+    printf("ADS reset complete\n");
 }
 
 // start data conversion
@@ -160,6 +162,7 @@ void ADS_RDATAC() {
 
 void ADS_SDATAC() {
     int t;
+    printf("SDATAC begin\n");
     
     digitalWrite(CS_PIN, 0);
     spi_write(_SDATAC);
