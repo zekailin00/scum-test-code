@@ -60,12 +60,14 @@ int main(void) {
 		
 	for (i = 0; i < 10; i++);
 		
+	printf("read ads data\n");
     for (i = 0; i < Nsample; i++) {
       read_ads_register(&app_vars.ads_measurement[i]);
     }
-
+printf("print ads data\n");
     for (i = 0; i < Nsample; i++) {
       // printf("%x\n",app_vars.ads_measurement[i].config);
+			printf("printf sample %d", i);
 	    for (j = 7; j < 8; j++) {
 		    printf("0x%x\r\n", app_vars.ads_measurement[i].channel[j]);
 	    }
@@ -84,7 +86,7 @@ int main(void) {
 
   // while(1){
 		// print_reg = ADS_RREG(0x00);
-		// printf("ID: %x\n",  print_reg);
+		// printrf("ID: %x\n",  print_reg);
 			// spi_write(0x11);
 //			printf("0x11\n");
 		 //      ADS_initialize();  
@@ -93,8 +95,8 @@ int main(void) {
 
 //        for (i = 0; i < 1000000; i++);
   //  }
+	printf("exit\n");
 }
-
 //=========================== public ==========================================
 
 //=========================== private =========================================

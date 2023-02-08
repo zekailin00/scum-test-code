@@ -17,7 +17,7 @@
 int spi_handle = 0;
 
 void digitalWrite(int pin, int high_low) {
-	printf("wrote pin: %d high_low =: %d\r\n", pin, high_low);
+	// printf("wrote pin: %d high_low =: %d\r\n", pin, high_low);
     if (high_low) {
         GPIO_REG__OUTPUT |= (1 << pin);
 	}
