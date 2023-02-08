@@ -1,4 +1,4 @@
-#include "ads1299.h"
+#include "ads1299-2.h"
 #include "Memory_Map.h"
 #include <stdio.h>
 #include "spi2.h"
@@ -41,7 +41,7 @@ void ADS_initialize() {
     int clk_pin = CLK_PIN;
     int cs_pin = CS_PIN;
     int MOSI_pin = DATA_PIN;
-    pin_config_t spi_config;
+    spi_pin_config_t spi_config;
 
 
 	// Hex nibble 4: 0x8 = 0b1000 

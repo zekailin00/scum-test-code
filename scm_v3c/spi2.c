@@ -11,30 +11,17 @@
 typedef struct node_t
 {
     int handle;
-    pin_config_t config;
-    node_t* child;
+    spi_pin_config_t config;
+    struct node_t* child;
 } node_t;
 
 static int handle_count = 0;
 static node_t* root = 0;
 static node_t* last = 0;
 
-inline void digitalWrite(int pin, int high_low) {
-	printf("wrote pin: %d high_low =: %d\r\n", pin, high_low);
-    if (high_low) {
-        GPIO_REG__OUTPUT |= (1 << pin);
-	}
-    else {
-        GPIO_REG__OUTPUT &= ~(1 << pin);
-	}
-}
+void digitalWrite(int pin, int high_low);
 
-inline uint8_t digitalRead(int pin) {
-	uint8_t i = 0;
-	i = (GPIO_REG__INPUT&(1 << pin)) >> pin;
-
-	return i;
-}
+uint8_t digitalRead(int pin);
 
 node_t* get_node(int handle)
 {
@@ -51,7 +38,7 @@ node_t* get_node(int handle)
     return node;
 }
 
-int open(pin_config_t *pin_config, mode_t* mode)
+int open(spi_pin_config_t *pin_config, spi_mode_t* mode)
 {
     uint32_t gpi;
     uint32_t gpo;
@@ -78,7 +65,7 @@ int open(pin_config_t *pin_config, mode_t* mode)
     digitalWrite(pin_config->CS, 0);    // reset low
 
     node->handle = handle_count++;
-    memcpy(&node->config, pin_config, sizeof(pin_config_t));
+    memcpy(&node->config, pin_config, sizeof(spi_pin_config_t));
     node->child = 0;
 
     if (root == 0)
@@ -91,7 +78,7 @@ int open(pin_config_t *pin_config, mode_t* mode)
         last->child = node;
         last = node;
     }
-
+    printf("using spi2\n");
     return node->handle;
 }
 

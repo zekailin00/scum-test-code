@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "spi.h"
+#include "spi2.h"
 
 //SPI Command Definition Byte Assignments (Datasheet, p35)
 #define _WAKEUP 0x02 // Wake-up from standby mode
