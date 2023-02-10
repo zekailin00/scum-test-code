@@ -217,7 +217,8 @@ void read_ads_register(ads_data_t* ads_measurement) {
 	int32_t read_24bit;
 
 //	ADS_START();
-	while (digitalRead(DRDY_PIN));
+	while (digitalRead(DRDY_PIN))
+        printf("reading DRDY\n");
 	// while (digitalRead(DRDY_PIN) == 0x00);
 	// while (digitalRead(DRDY_PIN) == 0x01);
 
