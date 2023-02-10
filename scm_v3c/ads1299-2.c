@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "spi2.h"
 
-// TODO: move this into the spi_config struct
+
 // SPI bus definitions
 #define CS_PIN      11
 #define CLK_PIN     14
@@ -48,11 +48,6 @@ unsigned char spi_read(){
 
 void ADS_initialize() {
     int t;
-    int rst_pin = RST_PIN;
-    int drdy_pin = DRDY_PIN;
-    int clk_pin = CLK_PIN;
-    int cs_pin = CS_PIN;
-    int MOSI_pin = DATA_PIN;
     spi_mode_t spi_mode;
     spi_pin_config_t spi_config;
 
@@ -63,28 +58,27 @@ void ADS_initialize() {
     spi_config.SCLK = CLK_PIN;
 
     // Hex nibble 4: 0x8 = 0b1000 
-    //  Pin 3	(DRDY)
+    //  Pin 3 (DRDY)
     spi_mode.gpi_extra = 0x0008;
 
-    // Hex nibble 1: 0xD = 14 = 0b1000
+    // Hex nibble 1: 0x8  = 0b1000 =
     //  Pin 15 (ADS_RESET)
     // Hex nibble 3: 0x8 = 0b1000 =
     //  Pin 7 (ADS_DVDD 1.8V)
     spi_mode.gpo_extra = 0x8080;
 
     spi_handle = open(&spi_config, &spi_mode);
-
-    // Enable power to the ADS1299
-	digitalWrite(ADS_DVDD, 1);
-    
-    // toggle reset pin
-    digitalWrite(rst_pin, 0);    // reset low
     
     if (spi_handle < 0)
     {
         printf("Open SPI failed.\n");
         exit();
     }
+
+    // Enable power to the ADS1299
+	digitalWrite(ADS_DVDD, 1);
+    // toggle reset pin
+    digitalWrite(RST_PIN, 0);
 
     // cortex clock 2MHz(0.5us)
     // power up ~32ms
@@ -193,7 +187,7 @@ void ADS_RREGS(unsigned char addr, unsigned char NregminusOne) {
 
     ioctl(spi_handle, SPI_SELECT, 0);
     write(spi_handle, opcode1);
-    ioctl(spi_handle, SPI_DESELECT, 0);
+    write(spi_handle, NregminusOne);
     
 	for (i = 0; i <= NregminusOne; i++) {
         read(spi_handle, &read_reg);
@@ -213,8 +207,6 @@ void read_ads_register(ads_data_t* ads_measurement) {
 
     do read(spi_handle, &data_ready);
     while (data_ready);
-	// while (digitalRead(DRDY_PIN) == 0x00);
-	// while (digitalRead(DRDY_PIN) == 0x01);
 
     ioctl(spi_handle, SPI_SELECT, 0);
 	read_24bit = 0;
