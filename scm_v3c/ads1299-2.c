@@ -53,39 +53,32 @@ void ADS_initialize() {
     int clk_pin = CLK_PIN;
     int cs_pin = CS_PIN;
     int MOSI_pin = DATA_PIN;
+    spi_mode_t spi_mode;
     spi_pin_config_t spi_config;
 
-
-	// Hex nibble 4: 0x8 = 0b1000 
-    //  Pin 3	(DRDY)
-    GPI_enables(0x0008);
-
-    // Hex nibble 1: 0xD = 14 = 0b1000
-    //  Pin 15 (ADS_RESET)
-    // Hex nibble 3: 0x8 = 0b1000 =
-    //  Pin 7 (ADS_DVDD 1.8V)
-    GPO_enables(0x8080);
-
-    analog_scan_chain_write();
-    analog_scan_chain_load();
-
-
-	// Enable power to the ADS1299
-	digitalWrite(ADS_DVDD, 1);
-    
-    // cortex clock 2MHz(0.5us)
-    // power up ~32ms
-    for (t = 0; t < 65000; t++);
-    
-    // toggle reset pin
-    digitalWrite(rst_pin, 0);    // reset low
 
     spi_config.CS = CS_PIN;
     spi_config.MISO = DIN_PIN;
     spi_config.MOSI = DATA_PIN;
     spi_config.SCLK = CLK_PIN;
 
-    spi_handle = open(&spi_config, 0);
+    // Hex nibble 4: 0x8 = 0b1000 
+    //  Pin 3	(DRDY)
+    spi_mode.gpi_extra = 0x0008;
+
+    // Hex nibble 1: 0xD = 14 = 0b1000
+    //  Pin 15 (ADS_RESET)
+    // Hex nibble 3: 0x8 = 0b1000 =
+    //  Pin 7 (ADS_DVDD 1.8V)
+    spi_mode.gpo_extra = 0x8080;
+
+    spi_handle = open(&spi_config, &spi_mode);
+
+    // Enable power to the ADS1299
+	digitalWrite(ADS_DVDD, 1);
+    
+    // toggle reset pin
+    digitalWrite(rst_pin, 0);    // reset low
     
     if (spi_handle < 0)
     {
@@ -93,8 +86,10 @@ void ADS_initialize() {
         exit();
     }
 
-    for (t = 0; t < 10; t++);
-//		digitalWrite(MOSI_pin,0);		// test delay time
+    // cortex clock 2MHz(0.5us)
+    // power up ~32ms
+    for (t = 0; t < 65000; t++);
+
 	printf("Initialized ADS1299\r\n");
 }
 

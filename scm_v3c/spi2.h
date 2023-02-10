@@ -25,6 +25,8 @@ typedef struct spi_pin_config_t{
 typedef struct spi_mode_t{
     uint32_t data_rate;
     uint32_t buffer_size;
+    uint16_t gpi_extra;
+    uint16_t gpo_extra;
 } spi_mode_t;
 
 /**

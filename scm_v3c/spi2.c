@@ -44,10 +44,12 @@ int open(spi_pin_config_t *pin_config, spi_mode_t* mode)
     uint32_t gpo;
     node_t* node;
 
-    gpi = 1 << pin_config->MISO;
+    gpi = 1 << pin_config->MISO |
+          mode->gpi_extra;
     gpo = 1 << pin_config->CS |
           1 << pin_config->MOSI |
-          1 << pin_config->SCLK;
+          1 << pin_config->SCLK |
+          mode->gpo_extra;
     
     node = malloc(sizeof(node_t));
 
