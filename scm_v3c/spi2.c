@@ -82,7 +82,7 @@ int open(spi_pin_config_t *pin_config, spi_mode_t* mode)
     if (root == 0)
     {
         root = node; 
-        last = node->child;
+        last = node;
     }
     else 
     {
@@ -167,5 +167,44 @@ int read(int handle, unsigned char* byte)
 
 int close(int handle)
 {
-    //TODO: disable GPIOs and free the node corresponding to the handle?
+    node_t *node = root;
+    node_t *prev_node = 0;
+
+    // Find the device specified by the handle
+    while(node != 0)
+    {
+        if (node->handle == handle)
+            break;
+        else
+        {
+            prev_node = node;
+            node = node->child;
+        }
+    }
+
+    if (node == 0)
+    {
+        return INVALID_HANDLE;
+    }
+
+    if (node == root && node == last)
+    { // only one node, which is both root and last node.
+        root = 0;
+        last = 0;
+    }
+    else if (node == root)
+    { // node is root
+        node = node->child;
+    }
+    else if (node == last)
+    { // node is the last node
+        last = prev_node;
+    }
+    else
+    { // regular case
+        prev_node->child = node->child;
+    }
+
+    free(node);
+    return 0;
 }
