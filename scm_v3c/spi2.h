@@ -69,7 +69,7 @@ int open(spi_pin_config_t *pin_config, spi_mode_t* mode);
 /**
  * IO control for SPI.
  * @param handle The SPI peripheral handle returned from open().
- * @param request A device-depend request code.
+ * @param request A device-dependent request code.
  * @param argp A pointer to addtional arguments for requests. 
  *      If a request does not have additional arguments, the value is 0.
  * @return Non-negative value when successful.
