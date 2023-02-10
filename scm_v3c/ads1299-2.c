@@ -97,34 +97,30 @@ void ADS_initialize() {
 void ADS_WAKEUP() {
     int t;
     
-    digitalWrite(CS_PIN, 0);
-    spi_write(_WAKEUP);
-    digitalWrite(CS_PIN, 1);
+    ioctl(spi_handle, SPI_SELECT, 0);
+    write(spi_handle, _WAKEUP);
+    ioctl(spi_handle, SPI_DESELECT, 0);
     for (t = 0; t < 10; t++);
     // must wait 4 tCLK before sending another commands
 }
 
 // only allow to send WAKEUP after sending STANDBY
 void ADS_STANBY() {
-    digitalWrite(CS_PIN, 0);
-    spi_write(_STANDBY);
-    digitalWrite(CS_PIN, 1);
+    ioctl(spi_handle, SPI_SELECT, 0);
+    write(spi_handle, _STANDBY);
+    ioctl(spi_handle, SPI_DESELECT, 0);
 }
 
 // reset all the registers to defaut settings
 void ADS_RESET() {
     int t;
     
-    // digitalWrite(CS_PIN, 0);
     ioctl(spi_handle, SPI_SELECT, 0);
-
-    // spi_write(_RESET);
     write(spi_handle, _RESET);
 
     // must wait 18 tCLK to execute this command
     for (t = 0; t < 20; t++);
     
-    // digitalWrite(CS_PIN, 1);
     ioctl(spi_handle, SPI_DESELECT, 0);
 
     printf("ADS reset complete\n");
@@ -132,24 +128,24 @@ void ADS_RESET() {
 
 // start data conversion
 void ADS_START() {
-    digitalWrite(CS_PIN, 0);
-    spi_write(_START);
-    digitalWrite(CS_PIN, 1);
+    ioctl(spi_handle, SPI_SELECT, 0);
+    write(spi_handle, _START);
+    ioctl(spi_handle, SPI_DESELECT, 0);
 }
 
 // stop data conversion
 void ADS_STOP() {
-    digitalWrite(CS_PIN, 0);
-    spi_write(_STOP);
-    digitalWrite(CS_PIN, 1);
+    ioctl(spi_handle, SPI_SELECT, 0);
+    write(spi_handle, _STOP);
+    ioctl(spi_handle, SPI_DESELECT, 0);
 }
 
 void ADS_RDATAC() {
     int t;
     
-    digitalWrite(CS_PIN, 0);
-    spi_write(_RDATAC);
-    digitalWrite(CS_PIN, 1);
+    ioctl(spi_handle, SPI_SELECT, 0);
+    write(spi_handle, _RDATAC);
+    ioctl(spi_handle, SPI_DESELECT, 0);
     
     // must wait 4 tCLK after executing thsi command
     for (t = 0; t < 10; t++);
@@ -159,9 +155,9 @@ void ADS_SDATAC() {
     int t;
     printf("SDATAC begin\n");
     
-    digitalWrite(CS_PIN, 0);
-    spi_write(_SDATAC);
-    digitalWrite(CS_PIN, 1);
+    ioctl(spi_handle, SPI_SELECT, 0);
+    write(spi_handle, _SDATAC);
+    ioctl(spi_handle, SPI_DESELECT, 0);
     
     // must wait 4 tCLK after executing thsi command
     for (t = 0; t < 10; t++);
@@ -171,11 +167,11 @@ unsigned char ADS_RREG(unsigned char addr) {
     unsigned char opcode1 = addr + 0x20;
     unsigned char read_reg;
     
-    digitalWrite(CS_PIN, 0);
-    spi_write(opcode1);
-    spi_write(0x00);
-    read_reg = spi_read();
-    digitalWrite(CS_PIN, 1);
+    ioctl(spi_handle, SPI_SELECT, 0);
+    write(spi_handle, opcode1);
+    write(spi_handle, 0x00);
+    read(spi_handle, &read_reg);
+    ioctl(spi_handle, SPI_DESELECT, 0);
     
     return read_reg;
 }
@@ -183,11 +179,11 @@ unsigned char ADS_RREG(unsigned char addr) {
 void ADS_WREG(unsigned char addr, unsigned char val) {
 	unsigned char opcode1 = addr + 0x40;
 
-	digitalWrite(CS_PIN, 0);
-	spi_write(opcode1);
-	spi_write(0x00);
-	spi_write(val);
-	digitalWrite(CS_PIN, 1);
+    ioctl(spi_handle, SPI_SELECT, 0);
+    write(spi_handle, opcode1);
+    write(spi_handle, 0x00);
+    write(spi_handle, val);
+    ioctl(spi_handle, SPI_DESELECT, 0);
 }
 
 void ADS_RREGS(unsigned char addr, unsigned char NregminusOne) {
@@ -195,14 +191,15 @@ void ADS_RREGS(unsigned char addr, unsigned char NregminusOne) {
     unsigned char read_reg;
 	unsigned char i;
 
-    digitalWrite(CS_PIN, 0);
-    spi_write(opcode1);
-	spi_write(NregminusOne);
+    ioctl(spi_handle, SPI_SELECT, 0);
+    write(spi_handle, opcode1);
+    ioctl(spi_handle, SPI_DESELECT, 0);
+    
 	for (i = 0; i <= NregminusOne; i++) {
-		read_reg = spi_read();
+        read(spi_handle, &read_reg);
 		printf("%x\n", read_reg);
 	}
-    digitalWrite(CS_PIN, 1);
+    ioctl(spi_handle, SPI_DESELECT, 0);
 }
 
 void read_ads_register(ads_data_t* ads_measurement) {
@@ -210,17 +207,19 @@ void read_ads_register(ads_data_t* ads_measurement) {
 	int nchan = 8;
 	int i, j;
 	int32_t read_24bit;
+    unsigned char data_ready;
 
 //	ADS_START();
-	while (digitalRead(DRDY_PIN))
-        printf("reading DRDY\n");
+
+    do read(spi_handle, &data_ready);
+    while (data_ready);
 	// while (digitalRead(DRDY_PIN) == 0x00);
 	// while (digitalRead(DRDY_PIN) == 0x01);
 
-	digitalWrite(CS_PIN, 0);
+    ioctl(spi_handle, SPI_SELECT, 0);
 	read_24bit = 0;
 	for (i = 0; i < 3; i++) {
-		read_reg = spi_read();
+        read(spi_handle, &read_reg);
 		read_24bit = (read_24bit << 8) | read_reg;
 		// printf("%x", read_reg);
 	}
@@ -230,7 +229,7 @@ void read_ads_register(ads_data_t* ads_measurement) {
 	for (j = 0; j < nchan; j++) {
 		read_24bit = 0;
 		for (i = 0; i < 3; i++) {
-			read_reg = spi_read();
+            read(spi_handle, &read_reg);
 			read_24bit = (read_24bit << 8) | read_reg;
 			// printf("%x", read_reg);
 		}
@@ -244,7 +243,7 @@ void read_ads_register(ads_data_t* ads_measurement) {
 		ads_measurement->channel[j] = read_24bit;
 		// printf("channel[%d] = %x\n", j, read_24bit);
 	}
-	digitalWrite(CS_PIN, 1);
+    ioctl(spi_handle, SPI_DESELECT, 0);
 
 	// printf("%x\n", ads_measurement->config);
 	// for (j = 0; j < nchan; j++) {
