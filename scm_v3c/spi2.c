@@ -51,16 +51,16 @@ node_t* get_node(int handle)
 
 int open(spi_pin_config_t *pin_config, spi_mode_t* mode)
 {
-    uint32_t gpi;
-    uint32_t gpo;
+    uint16_t gpi;
+    uint16_t gpo;
     node_t* node;
 
     gpi = 1 << pin_config->MISO |
-          mode->gpi_extra;
+          GPI_enables_read();
     gpo = 1 << pin_config->CS |
           1 << pin_config->MOSI |
           1 << pin_config->SCLK |
-          mode->gpo_extra;
+          GPO_enables_read();
     
     node = malloc(sizeof(node_t));
 
@@ -93,7 +93,7 @@ int open(spi_pin_config_t *pin_config, spi_mode_t* mode)
     return node->handle;
 }
 
-int ioctl(int handle, int request, void *argp)
+int ioctl(int handle, int request, int32_t arg)
 {
     node_t* node;
     
@@ -103,14 +103,11 @@ int ioctl(int handle, int request, void *argp)
 
     switch (request)
     {
-    case SPI_SELECT:
-        spi_digitalWrite(node->config.CS, 0);
-        break;
-    case SPI_DESELECT:
-        spi_digitalWrite(node->config.CS, 1);
-        break;        
-    default:
-        return INVALID_IOCTL_REQ;
+        case SPI_CS:
+            spi_digitalWrite(node->config.CS, arg);
+            break;      
+        default:
+            return INVALID_IOCTL_REQ;
     }
 
     return 0;
