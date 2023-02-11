@@ -57,6 +57,8 @@ unsigned int read_RSSI(void);
 void set_IF_clock_frequency(int coarse, int fine, int high_range);
 void GPO_enables(unsigned int mask);
 void GPI_enables(unsigned int mask);
+uint16_t GPO_enables_read();
+uint16_t GPI_enables_read();
 void set_IF_LDO_voltage(int code);
 void set_VDDD_LDO_voltage(int code);
 void set_AUX_LDO_voltage(int code);

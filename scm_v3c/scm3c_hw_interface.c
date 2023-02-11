@@ -33,6 +33,10 @@
 // default setting
 static const uint32_t default_dac_2m_setting[] = {31, 31, 29, 2, 2};
 
+// Cache pins enabled from GPO_enables/GPI_enables calls
+uint16_t gpi_enable_cache = 0;
+uint16_t gpo_enable_cache = 0;
+
 typedef struct {
     uint32_t ASC[ASC_LEN];
     uint32_t dac_2M_settings[DAC_2M_SETTING_LEN];
@@ -283,6 +287,7 @@ void GPI_control(uint8_t row1, uint8_t row2, uint8_t row3, uint8_t row4) {
 // '1' = output enabled, so GPO_enables(0xFFFF) enables all output drivers
 // GPO enables are active low on-chip
 void GPO_enables(unsigned int mask) {
+    gpo_enable_cache = mask;
     // out_en<0:15> =
     // ASC<1131>,ASC<1133>,ASC<1135>,ASC<1137>,ASC<1140>,ASC<1142>,ASC<1144>,ASC<1146>,...
     // ASC<1115>,ASC<1117>,ASC<1119>,ASC<1121>,ASC<1124>,ASC<1126>,ASC<1128>,ASC<1130>
@@ -304,6 +309,7 @@ void GPO_enables(unsigned int mask) {
 // '1' = input enabled, so GPI_enables(0xFFFF) enables all inputs
 // GPI enables are active high on-chip
 void GPI_enables(unsigned int mask) {
+    gpi_enable_cache = mask;
     // in_en<0:15> =
     // ASC<1132>,ASC<1134>,ASC<1136>,ASC<1138>,ASC<1139>,ASC<1141>,ASC<1143>,ASC<1145>,...
     // ASC<1116>,ASC<1118>,ASC<1120>,ASC<1122>,ASC<1123>,ASC<1125>,ASC<1127>,ASC<1129>
@@ -319,6 +325,16 @@ void GPI_enables(unsigned int mask) {
             clear_asc_bit(asc_locations[j]);
         }
     }
+}
+
+uint16_t GPO_enables_read()
+{
+    return gpo_enable_cache;
+}
+
+uint16_t GPI_enables_read()
+{
+    return gpi_enable_cache;
 }
 
 // Configure how radio and AUX LDOs are turned on and off
