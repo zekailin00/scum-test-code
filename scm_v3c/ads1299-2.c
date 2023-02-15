@@ -55,13 +55,13 @@ void ADS_initialize() {
 
     // Hex nibble 4: 0x8 = 0b1000 
     //  Pin 3 (DRDY)
-    uint16_t gpi = 0x0008 | GPI_enables_read();
+    gpi = 0x0008 | GPI_enables_read();
 
     // Hex nibble 1: 0x8  = 0b1000 =
     //  Pin 15 (ADS_RESET)
     // Hex nibble 3: 0x8 = 0b1000 =
     //  Pin 7 (ADS_DVDD 1.8V)
-    uint16_t gpo = 0x8080 | GPO_enables_read();
+    gpo = 0x8080 | GPO_enables_read();
 
     GPI_enables(gpi);
     GPO_enables(gpo);
