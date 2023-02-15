@@ -36,6 +36,11 @@ static const uint32_t default_dac_2m_setting[] = {31, 31, 29, 2, 2};
 // Cache pins enabled from GPO_enables/GPI_enables calls
 uint16_t gpi_enable_cache = 0;
 uint16_t gpo_enable_cache = 0;
+/**
+ * Initialization does not work here.
+ * Maybe a compiler issue? 
+ * Need to initialize them manually when first use them.
+*/
 
 typedef struct {
     uint32_t ASC[ASC_LEN];
@@ -294,7 +299,15 @@ void GPO_enables(unsigned int mask) {
                                         1144, 1146, 1115, 1117, 1119, 1121,
                                         1124, 1126, 1128, 1130};
     unsigned int j;
+    static int reset = 0;
+    if (reset == 0)
+    {
+        gpo_enable_cache = 0;
+        reset = 1;
+    }
+
     gpo_enable_cache = mask;
+
     for (j = 0; j <= 15; j++) {
         if ((mask >> j) & 0x1) {
             clear_asc_bit(asc_locations[j]);
@@ -315,7 +328,14 @@ void GPI_enables(unsigned int mask) {
                                         1143, 1145, 1116, 1118, 1120, 1122,
                                         1123, 1125, 1127, 1129};
     unsigned int j;
+    static reset = 0;
+    if (reset == 0)
+    {
+        gpi_enable_cache = 0;
+        reset = 1;
+    }
     gpi_enable_cache = mask;
+
     for (j = 0; j <= 15; j++) {
         if ((mask >> j) & 0x1) {
             set_asc_bit(asc_locations[j]);
@@ -327,11 +347,25 @@ void GPI_enables(unsigned int mask) {
 
 uint16_t GPO_enables_read()
 {
+    static reset = 0;
+    if (reset == 0)
+    {
+        gpo_enable_cache = 0;
+        reset = 1;
+    }
+    printf("\nGPO en: 0x%x\n", gpo_enable_cache);
     return gpo_enable_cache;
 }
 
 uint16_t GPI_enables_read()
 {
+    static reset = 0;
+    if (reset == 0)
+    {
+        gpi_enable_cache = 0;
+        reset = 1;
+    }
+    printf("\nGPI en: 0x%x\n", gpi_enable_cache);
     return gpi_enable_cache;
 }
 
