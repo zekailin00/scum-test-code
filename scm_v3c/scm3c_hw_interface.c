@@ -36,6 +36,11 @@ static const uint32_t default_dac_2m_setting[] = {31, 31, 29, 2, 2};
 // Cache pins enabled from GPO_enables/GPI_enables calls
 uint16_t gpi_enable_cache = 0;
 uint16_t gpo_enable_cache = 0;
+/**
+ * Initialization does not work here.
+ * Maybe a compiler issue? 
+ * Need to initialize them manually when first use them.
+*/
 
 typedef struct {
     uint32_t ASC[ASC_LEN];
@@ -287,7 +292,6 @@ void GPI_control(uint8_t row1, uint8_t row2, uint8_t row3, uint8_t row4) {
 // '1' = output enabled, so GPO_enables(0xFFFF) enables all output drivers
 // GPO enables are active low on-chip
 void GPO_enables(unsigned int mask) {
-    gpo_enable_cache = mask;
     // out_en<0:15> =
     // ASC<1131>,ASC<1133>,ASC<1135>,ASC<1137>,ASC<1140>,ASC<1142>,ASC<1144>,ASC<1146>,...
     // ASC<1115>,ASC<1117>,ASC<1119>,ASC<1121>,ASC<1124>,ASC<1126>,ASC<1128>,ASC<1130>
@@ -295,6 +299,14 @@ void GPO_enables(unsigned int mask) {
                                         1144, 1146, 1115, 1117, 1119, 1121,
                                         1124, 1126, 1128, 1130};
     unsigned int j;
+    static int reset = 0;
+    if (reset == 0)
+    {
+        gpo_enable_cache = 0;
+        reset = 1;
+    }
+
+    gpo_enable_cache = mask;
 
     for (j = 0; j <= 15; j++) {
         if ((mask >> j) & 0x1) {
@@ -309,7 +321,6 @@ void GPO_enables(unsigned int mask) {
 // '1' = input enabled, so GPI_enables(0xFFFF) enables all inputs
 // GPI enables are active high on-chip
 void GPI_enables(unsigned int mask) {
-    gpi_enable_cache = mask;
     // in_en<0:15> =
     // ASC<1132>,ASC<1134>,ASC<1136>,ASC<1138>,ASC<1139>,ASC<1141>,ASC<1143>,ASC<1145>,...
     // ASC<1116>,ASC<1118>,ASC<1120>,ASC<1122>,ASC<1123>,ASC<1125>,ASC<1127>,ASC<1129>
@@ -317,6 +328,13 @@ void GPI_enables(unsigned int mask) {
                                         1143, 1145, 1116, 1118, 1120, 1122,
                                         1123, 1125, 1127, 1129};
     unsigned int j;
+    static reset = 0;
+    if (reset == 0)
+    {
+        gpi_enable_cache = 0;
+        reset = 1;
+    }
+    gpi_enable_cache = mask;
 
     for (j = 0; j <= 15; j++) {
         if ((mask >> j) & 0x1) {
@@ -329,11 +347,25 @@ void GPI_enables(unsigned int mask) {
 
 uint16_t GPO_enables_read()
 {
+    static reset = 0;
+    if (reset == 0)
+    {
+        gpo_enable_cache = 0;
+        reset = 1;
+    }
+    printf("\nGPO en: 0x%x\n", gpo_enable_cache);
     return gpo_enable_cache;
 }
 
 uint16_t GPI_enables_read()
 {
+    static reset = 0;
+    if (reset == 0)
+    {
+        gpi_enable_cache = 0;
+        reset = 1;
+    }
+    printf("\nGPI en: 0x%x\n", gpi_enable_cache);
     return gpi_enable_cache;
 }
 
