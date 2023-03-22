@@ -1,7 +1,7 @@
-#include "ads1299-2.h"
+#include "ads1299.h"
 #include "Memory_Map.h"
 #include <stdio.h>
-#include "spi2.h"
+#include "spi.h"
 
 
 // SPI bus definitions

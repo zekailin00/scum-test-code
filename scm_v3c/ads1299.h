@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "spi2.h"
+#include "spi.h"
 
 //SPI Command Definition Byte Assignments (Datasheet, p35)
 #define _WAKEUP 0x02 // Wake-up from standby mode
@@ -43,7 +43,6 @@ typedef struct ads_data_t{
 	int32_t channel[8];
 } ads_data_t;
 
-void digitalWrite(int pin, int high_low);
 
 void ADS_initialize();
 

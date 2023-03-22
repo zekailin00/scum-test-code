@@ -3,7 +3,7 @@
 #include "memory_map.h"
 #include "optical.h"
 #include "scm3c_hw_interface.h"
-#include "spi.h"
+#include "imu.h"
 
 //=========================== defines =========================================
 
