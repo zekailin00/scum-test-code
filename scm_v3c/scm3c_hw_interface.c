@@ -41,7 +41,6 @@ uint16_t gpo_enable_cache = 0;
  * Maybe a compiler issue? 
  * Need to initialize them manually when first use them.
 */
-
 typedef struct {
     uint32_t ASC[ASC_LEN];
     uint32_t dac_2M_settings[DAC_2M_SETTING_LEN];
@@ -299,14 +298,8 @@ void GPO_enables(unsigned int mask) {
                                         1144, 1146, 1115, 1117, 1119, 1121,
                                         1124, 1126, 1128, 1130};
     unsigned int j;
-    static int reset = 0;
-    if (reset == 0)
-    {
-        gpo_enable_cache = 0;
-        reset = 1;
-    }
 
-    gpo_enable_cache = mask;
+    gpo_enable_cache = 0;
 
     for (j = 0; j <= 15; j++) {
         if ((mask >> j) & 0x1) {
@@ -328,13 +321,8 @@ void GPI_enables(unsigned int mask) {
                                         1143, 1145, 1116, 1118, 1120, 1122,
                                         1123, 1125, 1127, 1129};
     unsigned int j;
-    static reset = 0;
-    if (reset == 0)
-    {
-        gpi_enable_cache = 0;
-        reset = 1;
-    }
-    gpi_enable_cache = mask;
+
+    gpi_enable_cache = 0;
 
     for (j = 0; j <= 15; j++) {
         if ((mask >> j) & 0x1) {
@@ -345,28 +333,108 @@ void GPI_enables(unsigned int mask) {
     }
 }
 
-uint16_t GPO_enables_read()
-{
-    static reset = 0;
-    if (reset == 0)
-    {
-        gpo_enable_cache = 0;
-        reset = 1;
+void GPI_enable_set(unsigned int index) {
+    // in_en<0:15> =
+    // ASC<1132>,ASC<1134>,ASC<1136>,ASC<1138>,ASC<1139>,ASC<1141>,ASC<1143>,ASC<1145>,...
+    // ASC<1116>,ASC<1118>,ASC<1120>,ASC<1122>,ASC<1123>,ASC<1125>,ASC<1127>,ASC<1129>
+    unsigned short asc_locations[16] = {1132, 1134, 1136, 1138, 1139, 1141,
+                                        1143, 1145, 1116, 1118, 1120, 1122,
+                                        1123, 1125, 1127, 1129};
+    unsigned int j;
+
+    if (index >= 16)
+        return;
+
+    gpi_enable_cache |= 1 << index;
+
+    for (j = 0; j <= 15; j++) {
+        if ((gpi_enable_cache >> j) & 0x1) {
+            set_asc_bit(asc_locations[j]);
+        } else {
+            clear_asc_bit(asc_locations[j]);
+        }
     }
-    printf("\nGPO en: 0x%x\n", gpo_enable_cache);
-    return gpo_enable_cache;
+
+    analog_scan_chain_write();
+    analog_scan_chain_load();
 }
 
-uint16_t GPI_enables_read()
-{
-    static reset = 0;
-    if (reset == 0)
-    {
-        gpi_enable_cache = 0;
-        reset = 1;
+void GPI_enable_clr(unsigned int index) {
+    // in_en<0:15> =
+    // ASC<1132>,ASC<1134>,ASC<1136>,ASC<1138>,ASC<1139>,ASC<1141>,ASC<1143>,ASC<1145>,...
+    // ASC<1116>,ASC<1118>,ASC<1120>,ASC<1122>,ASC<1123>,ASC<1125>,ASC<1127>,ASC<1129>
+    unsigned short asc_locations[16] = {1132, 1134, 1136, 1138, 1139, 1141,
+                                        1143, 1145, 1116, 1118, 1120, 1122,
+                                        1123, 1125, 1127, 1129};
+    unsigned int j;
+
+    if (index >= 16)
+        return;
+
+    gpi_enable_cache &= ~(1 << index);
+
+    for (j = 0; j <= 15; j++) {
+        if ((gpi_enable_cache >> j) & 0x1) {
+            set_asc_bit(asc_locations[j]);
+        } else {
+            clear_asc_bit(asc_locations[j]);
+        }
     }
-    printf("\nGPI en: 0x%x\n", gpi_enable_cache);
-    return gpi_enable_cache;
+
+    analog_scan_chain_write();
+    analog_scan_chain_load();
+}
+
+void GPO_enable_set(unsigned int index) {
+    // in_en<0:15> =
+    // ASC<1132>,ASC<1134>,ASC<1136>,ASC<1138>,ASC<1139>,ASC<1141>,ASC<1143>,ASC<1145>,...
+    // ASC<1116>,ASC<1118>,ASC<1120>,ASC<1122>,ASC<1123>,ASC<1125>,ASC<1127>,ASC<1129>
+    unsigned short asc_locations[16] = {1132, 1134, 1136, 1138, 1139, 1141,
+                                        1143, 1145, 1116, 1118, 1120, 1122,
+                                        1123, 1125, 1127, 1129};
+    unsigned int j;
+
+    if (index >= 16)
+        return;
+
+    gpo_enable_cache |= 1 << index;
+
+    for (j = 0; j <= 15; j++) {
+        if ((gpo_enable_cache >> j) & 0x1) {
+            set_asc_bit(asc_locations[j]);
+        } else {
+            clear_asc_bit(asc_locations[j]);
+        }
+    }
+
+    analog_scan_chain_write();
+    analog_scan_chain_load();
+}
+
+void GPO_enable_clr(unsigned int index) {
+    // in_en<0:15> =
+    // ASC<1132>,ASC<1134>,ASC<1136>,ASC<1138>,ASC<1139>,ASC<1141>,ASC<1143>,ASC<1145>,...
+    // ASC<1116>,ASC<1118>,ASC<1120>,ASC<1122>,ASC<1123>,ASC<1125>,ASC<1127>,ASC<1129>
+    unsigned short asc_locations[16] = {1132, 1134, 1136, 1138, 1139, 1141,
+                                        1143, 1145, 1116, 1118, 1120, 1122,
+                                        1123, 1125, 1127, 1129};
+    unsigned int j;
+
+    if (index >= 16)
+        return;
+
+    gpo_enable_cache &= ~(1 << index);
+
+    for (j = 0; j <= 15; j++) {
+        if ((gpo_enable_cache >> j) & 0x1) {
+            set_asc_bit(asc_locations[j]);
+        } else {
+            clear_asc_bit(asc_locations[j]);
+        }
+    }
+
+    analog_scan_chain_write();
+    analog_scan_chain_load();
 }
 
 // Configure how radio and AUX LDOs are turned on and off

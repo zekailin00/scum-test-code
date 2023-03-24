@@ -1,4 +1,4 @@
-#include "spi2.h"
+#include "spi.h"
 
 #include "scm3c_hw_interface.h"
 #include "Memory_Map.h"
@@ -51,25 +51,15 @@ node_t* get_node(int handle)
 
 int open(spi_pin_config_t *pin_config, spi_mode_t* mode)
 {
-    uint16_t gpi;
-    uint16_t gpo;
     node_t* node;
 
-    gpi = 1 << pin_config->MISO |
-          GPI_enables_read();
-    gpo = 1 << pin_config->CS |
-          1 << pin_config->MOSI |
-          1 << pin_config->SCLK |
-          GPO_enables_read();
+
+    GPI_enable_set(pin_config->MISO);
+    GPO_enable_set(pin_config->CS);
+    GPO_enable_set(pin_config->MOSI);
+    GPO_enable_set(pin_config->SCLK);
     
     node = malloc(sizeof(node_t));
-
-    GPI_enables(gpi);
-    GPO_enables(gpo);
-
-    // Program analog scan chain (update GPIO configs)
-    analog_scan_chain_write();
-    analog_scan_chain_load();
 
     spi_digitalWrite(pin_config->MOSI, 0);    // reset low
     spi_digitalWrite(pin_config->SCLK, 0);    // reset low
@@ -89,7 +79,6 @@ int open(spi_pin_config_t *pin_config, spi_mode_t* mode)
         last->child = node;
         last = node;
     }
-    printf("using spi2\n");
     return node->handle;
 }
 
@@ -117,8 +106,6 @@ int write(int handle, const unsigned char write_byte)
 {
     int bit;
     node_t* node;
-
-    printf("SPI write begin\n");
 
     node = get_node(handle);
     if (node == 0)

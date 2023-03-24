@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "scm3c_hw_interface.h"
 
 #ifndef __SPI_LIB
 #define __SPI_LIB

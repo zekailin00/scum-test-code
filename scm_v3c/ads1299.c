@@ -55,20 +55,15 @@ void ADS_initialize() {
 
     // Hex nibble 4: 0x8 = 0b1000 
     //  Pin 3 (DRDY)
-    gpi = 0x0008 | GPI_enables_read();
+    GPI_enable_set(3);
 
     // Hex nibble 1: 0x8  = 0b1000 =
     //  Pin 15 (ADS_RESET)
     // Hex nibble 3: 0x8 = 0b1000 =
     //  Pin 7 (ADS_DVDD 1.8V)
-    gpo = 0x8080 | GPO_enables_read();
-
-    GPI_enables(gpi);
-    GPO_enables(gpo);
-
-    // Program analog scan chain (update GPIO configs)
-    analog_scan_chain_write();
-    analog_scan_chain_load();
+    GPO_enable_set(15);
+    GPO_enable_set(7);
+    
 
     spi_config.CS = CS_PIN;
     spi_config.MISO = DIN_PIN;
